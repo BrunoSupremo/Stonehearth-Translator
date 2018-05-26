@@ -1,12 +1,17 @@
 var saved_json = null;
 
 function download(){
-	var dataStr = "data:text/json;charset=utf-8,"+ encodeURIComponent(
-		JSON.stringify(saved_json, null, "\t")
-		);
-	var dlAnchorElem = document.getElementById('download');
-	dlAnchorElem.setAttribute("href", dataStr);
-	dlAnchorElem.click();
+	if ( navigator.msSaveBlob ) {
+		var blob = new Blob( [ JSON.stringify(saved_json, null, "\t") ], { type: "text/json"} );
+		navigator.msSaveBlob( blob, "your_translation.json" );
+	} else {
+		var dataStr = "data:text/json;charset=utf-8,"+ encodeURIComponent(
+			JSON.stringify(saved_json, null, "\t")
+			);
+		var dlAnchorElem = document.getElementById('download');
+		dlAnchorElem.setAttribute("href", dataStr);
+		dlAnchorElem.click();
+	}
 }
 
 function merge(en_json, your_json){
