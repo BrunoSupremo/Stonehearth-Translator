@@ -1,0 +1,36 @@
+<html>
+<head>
+	<title>Stonehearth Translator Tool</title>
+	<meta charset="utf-8">
+	<link rel="stylesheet" type="text/css" href="css.css">
+	<link rel="shortcut icon" type="image/png" href="favicon.png"/>
+</head>
+<body>
+	<header>
+		<label>
+			📂 Load en.json
+			<input type="file" accept=".json" id="en_fileinput_element" onchange="load_en_file()">
+		</label>
+		<label>
+			📂 Load your.json
+			<input type="file" accept=".json" id="your_fileinput_element" onchange="load_your_file()">
+		</label>
+		<label onclick="download()">
+			💾 Save your.json
+			<a href="" id="download" style="display: none;" download="your_translation.json"></a>
+		</label>
+		<label onclick="goto_next_unstranslated()">
+			📑 Next untranslated
+		</label>
+	</header>
+	<main></main>
+	<footer>
+		<span id="status">Loaded: Nothing</span>
+		<span id="strings">Strings: 0</span>
+		<span id="to_translate">Not translated: ?</span>
+		<span id="percent">Completed: ?</span>
+	</footer>
+
+	<script src="javascript.js"></script>
+</body>
+</html>
