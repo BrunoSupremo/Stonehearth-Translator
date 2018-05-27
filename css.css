@@ -9,6 +9,8 @@ header{
 	padding: 0.5em;
 	top: 0;
 	border-bottom: 1px solid #00000033;
+	display: flex;
+	justify-content: space-around;
 }
 footer{
 	color: #003;
@@ -70,7 +72,7 @@ li.key_value:nth-child(odd) {
 	background-color: #fff;
 }
 .needs_translation{
-	background-color: lightyellow;
+	background-color: #ffc;
 	border-left-color: yellow;
 	border-right-color: yellow;
 }
@@ -84,10 +86,16 @@ main > ul.needs_translation{
 .collapse_button:hover{
 	color: black;
 }
-.collapse_button{
+.collapse_button.change_arrow::before{
+	content: "►";
+}
+.collapse_button::before{
+	content: "▼";
 	font-size: .75em;
-	padding: 0 1em;
+}
+.collapse_button{
 	cursor: pointer;
+	padding-right: 1em;
 }
 ul.collapsed::before{
 	content: "***";
@@ -108,4 +116,23 @@ ul.collapsed{
 }
 input[type="text"]:focus{
 	box-shadow: -10px 0px 5px lightsteelblue;
+}
+
+input[readonly]{
+	background-color: #ffc;
+	box-shadow: -1em 0 0 yellow;
+	border-left-color: initial;
+	border-right-color: initial;
+}
+input[readonly].needs_translation{
+	background-color: white;
+	box-shadow: none;
+}
+input[readonly]:focus{
+	box-shadow: -10px 0px 5px lightsteelblue;
+}
+.compare_mode ul{
+	background-color: white;
+	border-left-color: #ccc;
+	border-right-color: #ccc;
 }

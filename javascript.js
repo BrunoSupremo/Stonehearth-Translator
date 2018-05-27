@@ -1,4 +1,60 @@
 var saved_json = null;
+var en_json = null;
+var your_json = null;
+var string_counter = 0;
+var needs_translation = 0;
+var compare_mode = false;
+
+function update_header(){
+	if(compare_mode){
+		document.getElementById('download').style.display="none";
+		document.getElementById('change_mode').innerHTML="📚 Translation mode";
+		document.getElementById('goto_next_unstranslated').innerHTML="📑 Next difference";
+	}else{
+		document.getElementById('download').style.display="";
+		document.getElementById('change_mode').innerHTML="⚖️ Compare mode";
+		document.getElementById('goto_next_unstranslated').innerHTML="📑 Next untranslated";
+	}
+}
+
+function update_footer(){
+	function loaded(){
+		if (your_json) {
+			return "both files";
+		}
+		if (en_json) {
+			return "en.json only";
+		}
+		return "Nothing";
+	}
+	if(compare_mode){
+		document.getElementById("status").innerHTML = "Loaded: "+loaded();
+		document.getElementById("strings").innerHTML = "Strings: "+string_counter;
+		document.getElementById("to_translate").innerHTML = "Differences: "+(string_counter-needs_translation);
+		document.getElementById("percent").innerHTML = "Similarity: "+(Math.floor(needs_translation/string_counter*1000)/10 || 100)+"%";
+	}else{
+		document.getElementById("status").innerHTML = "Loaded: "+loaded();
+		document.getElementById("strings").innerHTML = "Strings: "+string_counter;
+		document.getElementById("to_translate").innerHTML = "Not translated: "+needs_translation;
+		document.getElementById("percent").innerHTML = "Completed: "+(Math.ceil((string_counter-needs_translation)/string_counter*1000)/10 || 0)+"%";
+	}
+}
+
+function change_mode(){
+	compare_mode = !compare_mode;
+
+	update_header();
+	if (compare_mode) {
+		document.getElementsByTagName("main")[0].classList.add("compare_mode");
+	}else{
+		document.getElementsByTagName("main")[0].classList.remove("compare_mode");
+	}
+	var textInputs = document.querySelectorAll('input[type=text]');
+	for (var i = 0; i < textInputs.length; i++) {
+		textInputs[i].readOnly = compare_mode;
+	}
+	update_footer();
+}
 
 function download(){
 	if ( navigator.msSaveBlob ) {
@@ -14,18 +70,18 @@ function download(){
 	}
 }
 
-function merge(en_json, your_json){
+function merge(first_json, second_json){
 	var result = {};
-	for(var key in en_json) {
-		result[key] = en_json[key];
+	for(var key in first_json) {
+		result[key] = first_json[key];
 	}
-	for(var key in your_json) {
+	for(var key in second_json) {
 		if(result[key]){
-			if(typeof your_json[key] === 'string'){
-				result[key] = your_json[key];
+			if(typeof second_json[key] === 'string'){
+				result[key] = second_json[key];
 			}
 			else{
-				result[key] = merge(en_json[key], your_json[key]);
+				result[key] = merge(first_json[key], second_json[key]);
 			}
 		}
 	}
@@ -54,12 +110,12 @@ function changed_input_text(last_active_element){
 	last_active_input = last_active_element;
 	update_json_file();
 
-	uls = document.querySelectorAll('ul');
+	var uls = document.querySelectorAll('ul');
 	for(i = 0; i < uls.length; i++) {
 		uls[i].classList.remove("needs_translation");
 	}
-	textInputs = document.querySelectorAll('input[type=text]');
-	var needs_translation = 0;
+	var textInputs = document.querySelectorAll('input[type=text]');
+	needs_translation = 0;
 	for(i = 0; i < textInputs.length; i++) {
 		if (textInputs[i].value == textInputs[i].previousSibling.textContent){
 			needs_translation++;
@@ -75,17 +131,12 @@ function changed_input_text(last_active_element){
 			textInputs[i].classList.remove("needs_translation");
 		}
 	}
-	document.getElementById("to_translate").innerHTML = "Not translated: "+needs_translation;
-	document.getElementById("percent").innerHTML = "Completed: "+Math.ceil((string_counter-needs_translation)/string_counter*1000)/10+"%";
+	update_footer();
 }
 
 function collapse(arrow){
 	arrow.nextSibling.classList.toggle("collapsed");
-	if (arrow.innerHTML == "►"){
-		arrow.innerHTML = "▼";
-	}else{
-		arrow.innerHTML = "►";
-	}
+	arrow.classList.toggle("change_arrow");
 }
 
 function reset_input_file(input_file_element){
@@ -102,9 +153,17 @@ function goto_next_unstranslated(){
 		last_active_input = all_text_inputs[all_text_inputs.length-1];
 	}
 	let visible_text_inputs = [];
-	for(var i = 0; i < all_text_inputs.length; i++){
-		if ( ( isVisible(all_text_inputs[i]) && all_text_inputs[i].classList.contains('needs_translation') ) || all_text_inputs[i] == last_active_input){
-			visible_text_inputs.push(all_text_inputs[i]);
+	if (compare_mode) {
+		for(var i = 0; i < all_text_inputs.length; i++){
+			if ( ( isVisible(all_text_inputs[i]) && !all_text_inputs[i].classList.contains('needs_translation') ) || all_text_inputs[i] == last_active_input){
+				visible_text_inputs.push(all_text_inputs[i]);
+			}
+		}
+	}else{
+		for(var i = 0; i < all_text_inputs.length; i++){
+			if ( ( isVisible(all_text_inputs[i]) && all_text_inputs[i].classList.contains('needs_translation') ) || all_text_inputs[i] == last_active_input){
+				visible_text_inputs.push(all_text_inputs[i]);
+			}
 		}
 	}
 	for(var i = 0; i < visible_text_inputs.length; i++){
@@ -120,7 +179,6 @@ function goto_next_unstranslated(){
 	}
 }
 
-var string_counter = 0;
 function load_en_file() {
 	let en_input, en_file, fileReader;
 
@@ -151,7 +209,7 @@ function load_en_file() {
 				txt+="</li>";
 			}
 			else{
-				txt += "<li>"+key+"<span class='collapse_button' onclick='collapse(this)'>▼</span>";
+				txt += "<li><span class='collapse_button' onclick='collapse(this)'>"+key+"</span>";
 				txt += populateHTML(json_table[key], current_key);
 				txt += "</li>";
 			}
@@ -160,12 +218,11 @@ function load_en_file() {
 	}
 	function receivedText(e) {
 		let lines = e.target.result;
-		let en_json = JSON.parse(lines);
+		en_json = JSON.parse(lines);
 		saved_json = en_json;
 		let new_html = populateHTML(en_json, "");
 		document.getElementsByTagName("main")[0].innerHTML = new_html;
-		document.getElementById("status").innerHTML = "Loaded: en.json only";
-		document.getElementById("strings").innerHTML = "Strings: "+string_counter;
+		update_footer();
 		changed_input_text();
 		reset_input_file(en_input);
 	}
@@ -200,7 +257,7 @@ function load_your_file() {
 	}
 	function receivedText(e) {
 		let lines = e.target.result;
-		let your_json = JSON.parse(lines);
+		your_json = JSON.parse(lines);
 		saved_json = merge(saved_json, your_json)
 		needs_translation = 0;
 		populateHTML_inputs(saved_json, "");

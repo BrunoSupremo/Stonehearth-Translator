@@ -7,21 +7,30 @@
 </head>
 <body>
 	<header>
-		<label>
-			📂 Load en.json
-			<input type="file" accept=".json" id="en_fileinput_element" onchange="load_en_file()">
-		</label>
-		<label>
-			📂 Load your.json
-			<input type="file" accept=".json" id="your_fileinput_element" onchange="load_your_file()">
-		</label>
-		<label onclick="download()">
-			💾 Save your.json
-			<a href="" id="download" style="display: none;" download="your_translation.json"></a>
-		</label>
-		<label onclick="goto_next_unstranslated()">
-			📑 Next untranslated
-		</label>
+		<div>
+			<label>
+				📂 Load first.json
+				<input type="file" accept=".json" id="en_fileinput_element" onchange="load_en_file()">
+			</label>
+			<label>
+				📂 Load second.json
+				<input type="file" accept=".json" id="your_fileinput_element" onchange="load_your_file()">
+			</label>
+			<label id="download" onclick="download()">
+				💾 Save translation.json
+				<a href="" id="download" style="display: none;" download="your_translation.json"></a>
+			</label>
+		</div>
+		<div>
+			<label id="goto_next_unstranslated" onclick="goto_next_unstranslated()">
+				📑 Next untranslated
+			</label>
+		</div>
+		<div>
+			<label id="change_mode" onclick="change_mode()">
+				⚖️ Compare mode
+			</label>
+		</div>
 	</header>
 	<main></main>
 	<footer>
