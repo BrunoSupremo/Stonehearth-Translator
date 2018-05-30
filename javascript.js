@@ -64,7 +64,7 @@ function download(){
 		var dataStr = "data:text/json;charset=utf-8,"+ encodeURIComponent(
 			JSON.stringify(saved_json, null, "\t")
 			);
-		var dlAnchorElem = document.getElementById('download');
+		var dlAnchorElem = document.getElementById('actual_download');
 		dlAnchorElem.setAttribute("href", dataStr);
 		dlAnchorElem.click();
 	}
