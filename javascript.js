@@ -147,6 +147,16 @@ function isVisible(e) {
 	return !!( e.offsetWidth || e.offsetHeight || e.getClientRects().length );
 }
 
+function collapse_all_translated(){
+	var uls = document.querySelectorAll('ul');
+	for(i = 0; i < uls.length; i++) {
+		if ( isVisible(uls[i]) && !uls[i].classList.contains('needs_translation') ){
+			uls[i].classList.add("collapsed");
+			uls[i].previousSibling.classList.toggle("change_arrow");
+		}
+	}
+}
+
 function goto_next_unstranslated(){
 	let all_text_inputs = document.querySelectorAll("input[type='text']");
 	if (!last_active_input){
