@@ -31,12 +31,12 @@ function update_footer(){
 		document.getElementById("status").innerHTML = "Loaded: "+loaded();
 		document.getElementById("strings").innerHTML = "Strings: "+string_counter;
 		document.getElementById("to_translate").innerHTML = "Differences: "+(string_counter-needs_translation);
-		document.getElementById("percent").innerHTML = "Similarity: "+(Math.floor(needs_translation/string_counter*1000)/10 || 100)+"%";
+		document.getElementById("percent").innerHTML = "Similarity: "+(Math.floor(needs_translation/string_counter*10000)/100 || 100)+"%";
 	}else{
 		document.getElementById("status").innerHTML = "Loaded: "+loaded();
 		document.getElementById("strings").innerHTML = "Strings: "+string_counter;
 		document.getElementById("to_translate").innerHTML = "Not translated: "+needs_translation;
-		document.getElementById("percent").innerHTML = "Completed: "+(Math.ceil((string_counter-needs_translation)/string_counter*1000)/10 || 0)+"%";
+		document.getElementById("percent").innerHTML = "Completed: "+(Math.ceil((string_counter-needs_translation)/string_counter*10000)/100 || 0)+"%";
 	}
 }
 
