@@ -117,8 +117,10 @@ function changed_input_text(last_active_element){
 	var textInputs = document.querySelectorAll('input[type=text]');
 	needs_translation = 0;
 	for(i = 0; i < textInputs.length; i++) {
-		if (textInputs[i].value == textInputs[i].previousSibling.textContent){
+		if ( textInputs[i].value == textInputs[i].previousSibling.textContent
+			&& textInputs[i].value != "" && textInputs[i].value != " " ){
 			needs_translation++;
+			// ident
 			textInputs[i].classList.add("needs_translation");
 			var ul_element= textInputs[i].parentNode;
 			while (ul_element.tagName != "MAIN") {
@@ -228,7 +230,11 @@ function load_en_file() {
 	}
 	function receivedText(e) {
 		let lines = e.target.result;
-		en_json = JSON.parse(lines);
+		try{
+			en_json = JSON.parse(lines);
+		}catch (error){
+			alert("The json file contain an error. \n" + error );
+		}
 		saved_json = en_json;
 		let new_html = populateHTML(en_json, "");
 		document.getElementsByTagName("main")[0].innerHTML = new_html;
@@ -267,7 +273,11 @@ function load_your_file() {
 	}
 	function receivedText(e) {
 		let lines = e.target.result;
-		your_json = JSON.parse(lines);
+		try{
+			your_json = JSON.parse(lines);
+		}catch (error){
+			alert("The json file contain an error. \n" + error );
+		}
 		saved_json = merge(saved_json, your_json)
 		needs_translation = 0;
 		populateHTML_inputs(saved_json, "");
