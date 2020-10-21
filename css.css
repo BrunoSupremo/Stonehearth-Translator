@@ -64,6 +64,7 @@ li.key_value{
 }
 li.key_value *{
 	flex: 1;
+	margin: 0.2em 0;
 }
 li.key_value:nth-child(even) {
 	background-color: #00000009;
@@ -114,21 +115,26 @@ ul.collapsed{
 .collapsed > li{
 	display: none;
 }
-input[type="text"]:focus{
+textarea{
+	overflow: hidden;
+	font: inherit;
+	border-style: inset;
+}
+textarea:focus{
 	box-shadow: -10px 0px 5px lightsteelblue;
 }
 
-input[readonly]{
+textarea[readonly]{
 	background-color: #ffc;
 	box-shadow: -1em 0 0 yellow;
 	border-left-color: initial;
 	border-right-color: initial;
 }
-input[readonly].needs_translation{
+textarea[readonly].needs_translation{
 	background-color: white;
 	box-shadow: none;
 }
-input[readonly]:focus{
+textarea[readonly]:focus{
 	box-shadow: -10px 0px 5px lightsteelblue;
 }
 .compare_mode ul{

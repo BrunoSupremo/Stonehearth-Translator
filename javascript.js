@@ -49,7 +49,7 @@ function change_mode(){
 	}else{
 		document.getElementsByTagName("main")[0].classList.remove("compare_mode");
 	}
-	var textInputs = document.querySelectorAll('input[type=text]');
+	var textInputs = document.querySelectorAll('textarea');
 	for (var i = 0; i < textInputs.length; i++) {
 		textInputs[i].readOnly = compare_mode;
 	}
@@ -114,7 +114,7 @@ function changed_input_text(last_active_element){
 	for(i = 0; i < uls.length; i++) {
 		uls[i].classList.remove("needs_translation");
 	}
-	var textInputs = document.querySelectorAll('input[type=text]');
+	var textInputs = document.querySelectorAll('textarea');
 	needs_translation = 0;
 	for(i = 0; i < textInputs.length; i++) {
 		if ( textInputs[i].value == textInputs[i].previousSibling.textContent
@@ -160,7 +160,7 @@ function collapse_all_translated(){
 }
 
 function goto_next_unstranslated(){
-	let all_text_inputs = document.querySelectorAll("input[type='text']");
+	let all_text_inputs = document.querySelectorAll("textarea");
 	if (!last_active_input){
 		last_active_input = all_text_inputs[all_text_inputs.length-1];
 	}
@@ -216,8 +216,8 @@ function load_en_file() {
 				txt += "<span class='key'>"+key+": </span>";
 				txt += "<span class='value' id='"+current_key+"'>"+
 				json_table[key].replace(/</g,'&lt;')+"</span>";
-				txt += "<input type='text' onblur='changed_input_text(this)' ";
-				txt += "value='"+json_table[key].replace(/'/g,"&apos;")+"'>";
+				txt += "<textarea onblur='changed_input_text(this)'>";
+				txt += json_table[key].replace(/'/g,"&apos;")+"</textarea>";
 				txt+="</li>";
 			}
 			else{
