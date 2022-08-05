@@ -3,19 +3,6 @@ var en_json = null;
 var your_json = null;
 var string_counter = 0;
 var needs_translation = 0;
-var compare_mode = false;
-
-function update_header(){
-	if(compare_mode){
-		document.getElementById('download').style.display="none";
-		document.getElementById('change_mode').innerHTML="📚 Translation mode";
-		document.getElementById('goto_next_unstranslated').innerHTML="📑 Next difference";
-	}else{
-		document.getElementById('download').style.display="";
-		document.getElementById('change_mode').innerHTML="⚖️ Compare mode";
-		document.getElementById('goto_next_unstranslated').innerHTML="📑 Next untranslated";
-	}
-}
 
 function update_footer(){
 	function loaded(){
@@ -27,33 +14,10 @@ function update_footer(){
 		}
 		return "Nothing";
 	}
-	if(compare_mode){
-		document.getElementById("status").innerHTML = "Loaded: "+loaded();
-		document.getElementById("strings").innerHTML = "Strings: "+string_counter;
-		document.getElementById("to_translate").innerHTML = "Differences: "+(string_counter-needs_translation);
-		document.getElementById("percent").innerHTML = "Similarity: "+(Math.floor(needs_translation/string_counter*10000)/100 || 100)+"%";
-	}else{
-		document.getElementById("status").innerHTML = "Loaded: "+loaded();
-		document.getElementById("strings").innerHTML = "Strings: "+string_counter;
-		document.getElementById("to_translate").innerHTML = "Not translated: "+needs_translation;
-		document.getElementById("percent").innerHTML = "Completed: "+(Math.ceil((string_counter-needs_translation)/string_counter*10000)/100 || 0)+"%";
-	}
-}
-
-function change_mode(){
-	compare_mode = !compare_mode;
-
-	update_header();
-	if (compare_mode) {
-		document.getElementsByTagName("main")[0].classList.add("compare_mode");
-	}else{
-		document.getElementsByTagName("main")[0].classList.remove("compare_mode");
-	}
-	var textInputs = document.querySelectorAll('textarea');
-	for (var i = 0; i < textInputs.length; i++) {
-		textInputs[i].readOnly = compare_mode;
-	}
-	update_footer();
+	document.getElementById("status").innerHTML = "Loaded: "+loaded();
+	document.getElementById("strings").innerHTML = "Strings: "+string_counter;
+	document.getElementById("to_translate").innerHTML = "Not translated: "+needs_translation;
+	document.getElementById("percent").innerHTML = "Completed: "+(Math.ceil((string_counter-needs_translation)/string_counter*10000)/100 || 0)+"%";
 }
 
 function download(){
@@ -88,33 +52,75 @@ function merge(first_json, second_json){
 	return result;
 }
 
-function update_json_file(){
-	if(!last_active_input){
-		return;
-	}
-	var path = last_active_input.previousSibling.id.replace('.','');
-
+function update_json_file(this_input){
 	function update_json_key(old_json, path){
-		var current_level = path.shift();
+		let current_level = path.shift();
 		if(typeof old_json[current_level] === 'string'){
-			old_json[current_level] = last_active_input.value;
+			old_json[current_level] = this_input.value;
 		}else{
 			update_json_key(old_json[current_level], path);
 		}
 	}
+	let path = this_input.previousSibling.id;
 	update_json_key(saved_json, path.split("."));
 }
 
 var last_active_input = null;
-function changed_input_text(last_active_element){
-	last_active_input = last_active_element;
-	update_json_file();
+function changed_input_text(this_input){
+	last_active_input = this_input;
+	update_json_file(this_input);
 
-	var uls = document.querySelectorAll('ul');
+	if ( this_input.value == this_input.previousSibling.textContent
+		&& this_input.value != "" && this_input.value != " " ){
+		if( !this_input.classList.contains("needs_translation") ){
+			needs_translation++;
+			this_input.classList.add("needs_translation");
+			let ul_element= this_input.parentNode;
+			while (ul_element.tagName != "MAIN") {
+				if (ul_element.tagName == "UL"){
+					ul_element.classList.add("needs_translation");
+				}
+				ul_element = ul_element.parentNode;
+			}
+		}
+	}else{
+		if( this_input.classList.contains("needs_translation") ){
+			needs_translation--;
+			this_input.classList.remove("needs_translation");
+			let ul_element= this_input.parentNode;
+			while (ul_element.tagName != "MAIN") {
+				if (ul_element.tagName == "UL"){
+					let child_needs_translation = false
+					for(i = 0; i < ul_element.children.length; i++) {
+						let li = ul_element.children[i];
+						if( li.children[2] ){
+							if( li.children[2].classList.contains("needs_translation") ){
+								child_needs_translation = true;
+								break;
+							}
+						}else{
+							if( li.children[1].classList.contains("needs_translation") ){
+								child_needs_translation = true;
+								break;
+							}
+						}
+					}
+					if( !child_needs_translation ){
+						ul_element.classList.remove("needs_translation");
+					}
+				}
+				ul_element = ul_element.parentNode;
+			}
+		}
+	}
+	update_footer();
+}
+function changed_all_input_text(){
+	let uls = document.querySelectorAll('ul');
 	for(i = 0; i < uls.length; i++) {
 		uls[i].classList.remove("needs_translation");
 	}
-	var textInputs = document.querySelectorAll('textarea');
+	let textInputs = document.querySelectorAll('textarea');
 	needs_translation = 0;
 	for(i = 0; i < textInputs.length; i++) {
 		if ( textInputs[i].value == textInputs[i].previousSibling.textContent
@@ -122,7 +128,7 @@ function changed_input_text(last_active_element){
 			needs_translation++;
 			// ident
 			textInputs[i].classList.add("needs_translation");
-			var ul_element= textInputs[i].parentNode;
+			let ul_element= textInputs[i].parentNode;
 			while (ul_element.tagName != "MAIN") {
 				if (ul_element.tagName == "UL"){
 					ul_element.classList.add("needs_translation");
@@ -133,7 +139,6 @@ function changed_input_text(last_active_element){
 			textInputs[i].classList.remove("needs_translation");
 		}
 	}
-	update_footer();
 }
 
 function collapse(arrow){
@@ -165,17 +170,9 @@ function goto_next_unstranslated(){
 		last_active_input = all_text_inputs[all_text_inputs.length-1];
 	}
 	let visible_text_inputs = [];
-	if (compare_mode) {
-		for(var i = 0; i < all_text_inputs.length; i++){
-			if ( ( isVisible(all_text_inputs[i]) && !all_text_inputs[i].classList.contains('needs_translation') ) || all_text_inputs[i] == last_active_input){
-				visible_text_inputs.push(all_text_inputs[i]);
-			}
-		}
-	}else{
-		for(var i = 0; i < all_text_inputs.length; i++){
-			if ( ( isVisible(all_text_inputs[i]) && all_text_inputs[i].classList.contains('needs_translation') ) || all_text_inputs[i] == last_active_input){
-				visible_text_inputs.push(all_text_inputs[i]);
-			}
+	for(var i = 0; i < all_text_inputs.length; i++){
+		if ( ( isVisible(all_text_inputs[i]) && all_text_inputs[i].classList.contains('needs_translation') ) || all_text_inputs[i] == last_active_input){
+			visible_text_inputs.push(all_text_inputs[i]);
 		}
 	}
 	for(var i = 0; i < visible_text_inputs.length; i++){
@@ -189,6 +186,28 @@ function goto_next_unstranslated(){
 			}
 		}
 	}
+}
+
+function google_translation(){
+	//querySelectorAll is not an array, and changes in real time, so lets make an array
+	let all_text_inputs = document.querySelectorAll("textarea");
+	let textInputs = [];
+	for(let i = 0; i < all_text_inputs.length; i++){
+		if(all_text_inputs[i].classList.contains('needs_translation')){
+			textInputs.push(all_text_inputs[i]);
+		}
+	}
+	all_text_inputs = null;
+	let i=0;
+	myInterval = setInterval(function(){
+		textInputs[i].value = textInputs[i].nextSibling.textContent;
+		textInputs[i].focus();
+		i++;
+		if (i >= textInputs.length) {
+			clearInterval(myInterval);
+			alert("Finished");
+		}
+	}, 50);
 }
 
 function load_en_file() {
@@ -214,10 +233,13 @@ function load_en_file() {
 				string_counter++;
 				txt+="<li class='key_value'>";
 				txt += "<span class='key'>"+key+": </span>";
-				txt += "<span class='value' id='"+current_key+"'>"+
+				txt += "<span class='value' id='"+current_key.replace('.','')+"'>"+
 				json_table[key].replace(/</g,'&lt;')+"</span>";
 				txt += "<textarea onblur='changed_input_text(this)'>";
 				txt += json_table[key].replace(/'/g,"&apos;")+"</textarea>";
+				//div for the google translated text
+				txt += "<div class='translate'>";
+				txt += json_table[key].replace(/'/g,"&apos;")+"</div>";
 				txt+="</li>";
 			}
 			else{
@@ -238,8 +260,8 @@ function load_en_file() {
 		saved_json = en_json;
 		let new_html = populateHTML(en_json, "");
 		document.getElementsByTagName("main")[0].innerHTML = new_html;
+		changed_all_input_text();
 		update_footer();
-		changed_input_text();
 		reset_input_file(en_input);
 	}
 }
@@ -264,7 +286,8 @@ function load_your_file() {
 		for (key in json_table) {
 			var current_key = json_key_in_input_id+"."+key;
 			if(typeof json_table[key] === 'string'){
-				document.getElementById(current_key).nextSibling.value = json_table[key];
+				document.getElementById(current_key.replace('.',''))
+				.nextSibling.value = json_table[key];
 			}
 			else{
 				populateHTML_inputs(json_table[key], current_key);
@@ -282,7 +305,8 @@ function load_your_file() {
 		needs_translation = 0;
 		populateHTML_inputs(saved_json, "");
 		document.getElementById("status").innerHTML = "Loaded: both files";
-		changed_input_text();
+		changed_all_input_text();
+		update_footer();
 		reset_input_file(your_input);
 	}
 }

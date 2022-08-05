@@ -10,7 +10,10 @@ header{
 	top: 0;
 	border-bottom: 1px solid #00000033;
 	display: flex;
-	justify-content: space-around;
+	justify-content: space-between;
+}
+html:not([lang],[class]) header div:last-child{
+	display: none;	
 }
 footer{
 	color: #003;
@@ -124,21 +127,10 @@ textarea:focus{
 	box-shadow: -10px 0px 5px lightsteelblue;
 }
 
-textarea[readonly]{
-	background-color: #ffc;
-	box-shadow: -1em 0 0 yellow;
-	border-left-color: initial;
-	border-right-color: initial;
-}
-textarea[readonly].needs_translation{
-	background-color: white;
-	box-shadow: none;
-}
-textarea[readonly]:focus{
-	box-shadow: -10px 0px 5px lightsteelblue;
-}
-.compare_mode ul{
-	background-color: white;
-	border-left-color: #ccc;
-	border-right-color: #ccc;
+div.translate{
+	opacity: 0;
+	height: 0;
+	width: 0;
+	position: absolute;
+	overflow: hidden;
 }
