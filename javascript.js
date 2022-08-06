@@ -70,6 +70,10 @@ function changed_input_text(this_input){
 	last_active_input = this_input;
 	update_json_file(this_input);
 
+	if(google_translating){
+		return;
+	}
+
 	if ( this_input.value == this_input.previousSibling.textContent
 		&& this_input.value != "" && this_input.value != " " ){
 		if( !this_input.classList.contains("needs_translation") ){
@@ -189,6 +193,7 @@ function goto_next_unstranslated(){
 }
 
 function google_translation(){
+	google_translating = true;
 	//querySelectorAll is not an array, and changes in real time, so lets make an array
 	let all_text_inputs = document.querySelectorAll("textarea");
 	let textInputs = [];
@@ -199,15 +204,22 @@ function google_translation(){
 	}
 	all_text_inputs = null;
 	let i=0;
+	let startTime = performance.now();
 	myInterval = setInterval(function(){
 		textInputs[i].value = textInputs[i].nextSibling.textContent;
-		textInputs[i].focus();
+		textInputs[i].scrollIntoView();
+		update_json_file(textInputs[i]);
+
 		i++;
 		if (i >= textInputs.length) {
 			clearInterval(myInterval);
-			alert("Finished");
+			changed_all_input_text();
+			update_footer();
+			google_translating = false;
+			let endTime = Math.ceil((performance.now() - startTime)/1000);
+			alert("Finished in "+endTime+" seconds");
 		}
-	}, 50);
+	}, 1);
 }
 
 function load_en_file() {
@@ -239,7 +251,7 @@ function load_en_file() {
 				txt += json_table[key].replace(/'/g,"&apos;")+"</textarea>";
 				//div for the google translated text
 				txt += "<div class='translate'>";
-				txt += json_table[key].replace(/'/g,"&apos;")+"</div>";
+				txt += json_table[key].replace(/</g,'&lt;')+"</div>";
 				txt+="</li>";
 			}
 			else{
