@@ -253,6 +253,15 @@ function load_en_file() {
 		}catch (error){
 			alert("The json file contain an error. \n" + error );
 		}
+    function addKey(obj, key, value) {
+      Object.values(obj).forEach(val => {
+        if (val && typeof val === 'object') addKey(val, key, value);
+      });
+      if (!obj[key]) {
+        obj[key] = value;
+      }
+    }
+    addKey(en_json, "audited", false);
 		saved_json = en_json;
 		let new_html = populateHTML(en_json, "");
 		document.getElementsByTagName("main")[0].innerHTML = new_html;
