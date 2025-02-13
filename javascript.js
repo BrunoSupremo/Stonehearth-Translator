@@ -242,9 +242,15 @@ function load_en_file() {
 				txt += "<div class='translate'>";
 				txt += json_table[key].replace(/</g,'&lt;')+"</div>";
 				txt+="</li>";
-			}
+			}else if(typeof json_table[key] === 'boolean'){
+        // do nothing, since we don't want to show the audited key as a span
+      }
 			else{
-				txt += "<li><span class='collapse_button' onclick='collapse(this)'>"+key+"</span>";
+				if(json_table[key]["audited"]){
+          txt += "<li><span class='collapse_button change_arrow' onclick='collapse(this)' id='" + current_key.replace('.', '') + "'>" + key + " - audited translation" + "<input type='checkbox' value='audited' disabled checked='"+json_table[key]["audited"]+"'>" + "</span>";
+        } else {
+          txt += "<li><span class='collapse_button' onclick='collapse(this)' id='" + current_key.replace('.', '') + "'>" + key + " - audited translation" + "<input type='checkbox' value='audited' disabled>" + "</span>";
+        }
 				txt += populateHTML(json_table[key], current_key);
 				txt += "</li>";
 			}
