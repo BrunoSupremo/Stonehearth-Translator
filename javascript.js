@@ -54,14 +54,24 @@ function merge(first_json, second_json){
 
 function update_json_file(this_input){
 	function update_json_key(old_json, path){
-		let current_level = path.shift();
+    let target_level = path.slice(-1)[0];
+    let current_level = path.shift();
 		if(typeof old_json[current_level] === 'string'){
 			old_json[current_level] = this_input.value;
-		}else{
+		}else if(this_input.value == "audited" && target_level == current_level){
+      let audited = !this_input.checked;
+      this_input.checked = audited;
+      old_json[current_level]["audited"] = this_input.checked;
+    }else{
 			update_json_key(old_json[current_level], path);
 		}
 	}
-	let path = this_input.previousSibling.id;
+	let path = null;
+  if(this_input.value == "audited"){
+    path = this_input.parentNode.id;
+  }else{
+    path = this_input.previousSibling.id;
+  }
 	update_json_key(saved_json, path.split("."));
 }
 
