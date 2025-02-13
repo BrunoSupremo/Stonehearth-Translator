@@ -152,8 +152,15 @@ function changed_all_input_text(){
 }
 
 function collapse(arrow){
-	arrow.nextSibling.classList.toggle("collapsed");
-	arrow.classList.toggle("change_arrow");
+  let spans = arrow.parentNode.querySelectorAll("span.collapse_button");
+  let parentCheckbox = spans[0].children[0].checked;
+  spans.forEach(span => {
+    if(span == spans[0] || (!parentCheckbox && !span.children[0].checked)){
+      span.nextSibling.classList.toggle("collapsed");
+      span.classList.toggle("change_arrow");
+      update_json_file(span.children[0]);
+    }
+  });
 }
 
 function reset_input_file(input_file_element){
@@ -165,13 +172,15 @@ function isVisible(e) {
 }
 
 function collapse_all_translated(){
-	var uls = document.querySelectorAll('ul');
-	for(i = 0; i < uls.length; i++) {
-		if ( isVisible(uls[i]) && !uls[i].classList.contains('needs_translation') ){
-			uls[i].classList.add("collapsed");
-			uls[i].previousSibling.classList.toggle("change_arrow");
-		}
-	}
+	var spans = document.querySelectorAll("span.collapse_button");
+  console.log("spans",spans);
+  spans.forEach(span => {
+    if(!span.nextSibling.classList.contains("needs_translation") && !span.nextSibling.classList.contains("collapsed")){
+      span.nextSibling.classList.add("collapsed");
+      span.classList.add("change_arrow");
+      update_json_file(span.children[0]);
+    }
+  });
 }
 
 function goto_next_unstranslated(){
