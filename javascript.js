@@ -222,7 +222,12 @@ function load_en_file() {
 
 	string_counter = 0;
 	function populateHTML(json_table, json_key_in_input_id) {
-		var txt = "<ul>";
+    var txt = null;
+    if(json_table["audited"]){
+      txt = "<ul class='collapsed'>";
+    } else {
+      txt = "<ul>";
+    }
 		for (key in json_table) {
 			var current_key = json_key_in_input_id+"."+key;
 			if(typeof json_table[key] === 'string'){
