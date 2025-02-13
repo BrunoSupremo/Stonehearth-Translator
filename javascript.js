@@ -173,7 +173,6 @@ function isVisible(e) {
 
 function collapse_all_translated(){
 	var spans = document.querySelectorAll("span.collapse_button");
-  console.log("spans",spans);
   spans.forEach(span => {
     if(!span.nextSibling.classList.contains("needs_translation") && !span.nextSibling.classList.contains("collapsed")){
       span.nextSibling.classList.add("collapsed");
