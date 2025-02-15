@@ -204,6 +204,7 @@ function google_translation(){
 	}
 	changed_all_input_text();
 	update_footer();
+	last_active_input = textInputs[0];
 }
 
 function load_en_file() {
