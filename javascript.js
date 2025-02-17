@@ -75,10 +75,21 @@ function changed_input_text(this_input){
 		if( !this_input.classList.contains("needs_translation") ){
 			needs_translation++;
 			this_input.classList.add("needs_translation");
+
+      // Add class to the alert icon img for the text area
+			this_input.nextSibling.classList.add("needs_translation");
+
 			let ul_element= this_input.parentNode;
 			while (ul_element.tagName != "MAIN") {
 				if (ul_element.tagName == "UL"){
 					ul_element.classList.add("needs_translation");
+
+          // Check if it has previous sibling and if it is an img tag
+          if( ul_element.previousSibling && ul_element.previousSibling.tagName == "IMG" ){
+
+            // Add class to the alert icon for the collapse button
+            ul_element.previousSibling.classList.add("needs_translation");
+          }
 				}
 				ul_element = ul_element.parentNode;
 			}
@@ -87,10 +98,15 @@ function changed_input_text(this_input){
 		if( this_input.classList.contains("needs_translation") ){
 			needs_translation--;
 			this_input.classList.remove("needs_translation");
+
+      // Remove class from the alert icon img for the text area
+			this_input.nextSibling.classList.remove("needs_translation");
+
+      
 			let ul_element= this_input.parentNode;
 			while (ul_element.tagName != "MAIN") {
 				if (ul_element.tagName == "UL"){
-					let child_needs_translation = false
+					let child_needs_translation = false;
 					for(i = 0; i < ul_element.children.length; i++) {
 						let li = ul_element.children[i];
 						if( li.children[2] ){
@@ -107,6 +123,13 @@ function changed_input_text(this_input){
 					}
 					if( !child_needs_translation ){
 						ul_element.classList.remove("needs_translation");
+
+            // Check if it has previous sibling and if it is an img tag
+            if( ul_element.previousSibling && ul_element.previousSibling.tagName == "IMG" ){
+
+              // Remove class from the alert icon for the collapse button
+              ul_element.previousSibling.classList.remove("needs_translation");
+            }
 					}
 				}
 				ul_element = ul_element.parentNode;
@@ -119,6 +142,13 @@ function changed_all_input_text(){
 	let uls = document.querySelectorAll('ul');
 	for(i = 0; i < uls.length; i++) {
 		uls[i].classList.remove("needs_translation");
+
+    // Check if it has previous sibling and if it is an img tag
+    if( uls[i].previousSibling && uls[i].previousSibling.tagName == "IMG" ){
+
+      // Remove class from the alert icon for the collapse button
+      uls[i].previousSibling.classList.remove("needs_translation");
+    }
 	}
 	let textInputs = document.querySelectorAll('textarea');
 	needs_translation = 0;
@@ -128,21 +158,43 @@ function changed_all_input_text(){
 			needs_translation++;
 			// ident
 			textInputs[i].classList.add("needs_translation");
+
+      // Add class to the alert icon img for the text area
+			textInputs[i].nextSibling.classList.add("needs_translation");
+
+     
 			let ul_element= textInputs[i].parentNode;
 			while (ul_element.tagName != "MAIN") {
 				if (ul_element.tagName == "UL"){
 					ul_element.classList.add("needs_translation");
+
+          // Check if it has previous sibling and if it is an img tag
+          if( ul_element.previousSibling && ul_element.previousSibling.tagName == "IMG" ){
+
+            // Add class to the alert icon for the collapse button
+            ul_element.previousSibling.classList.add("needs_translation");
+          }
 				}
 				ul_element = ul_element.parentNode;
 			}
 		}else{
 			textInputs[i].classList.remove("needs_translation");
+
+      // Remove class from the alert icon img for the text area
+			textInputs[i].nextSibling.classList.remove("needs_translation");
 		}
 	}
 }
 
 function collapse(arrow){
+  // Add class to the down icon for the collapse button
+	arrow.children[0].classList.toggle("collapsed");
+
 	arrow.nextSibling.classList.toggle("collapsed");
+
+  // Add class to the alert icon for the collapse button
+	arrow.nextSibling.nextSibling.classList.toggle("collapsed");
+  
 	arrow.classList.toggle("change_arrow");
 }
 
@@ -155,13 +207,21 @@ function isVisible(e) {
 }
 
 function collapse_all_translated(){
-	var uls = document.querySelectorAll('ul');
-	for(i = 0; i < uls.length; i++) {
-		if ( isVisible(uls[i]) && !uls[i].classList.contains('needs_translation') ){
-			uls[i].classList.add("collapsed");
-			uls[i].previousSibling.classList.toggle("change_arrow");
-		}
-	}
+	var spans = document.querySelectorAll("span.collapse_button");
+  spans.forEach(span => {
+    if(!span.nextSibling.classList.contains("needs_translation") && !span.nextSibling.classList.contains("collapsed")){
+
+      // Add class to the down icon for the collapse button
+      span.children[0].classList.add("collapsed");
+
+      span.nextSibling.classList.add("collapsed");
+
+      // Add class to the alert icon for the collapse button
+      span.nextSibling.nextSibling.classList.add("collapsed");
+
+      span.classList.add("change_arrow");
+    }
+  });
 }
 
 function goto_next_unstranslated(){
@@ -186,6 +246,14 @@ function goto_next_unstranslated(){
 			}
 		}
 	}
+}
+
+function change_theme(){
+  if (document.getElementsByTagName("*")[0].id == "sh_theme") {
+    document.getElementsByTagName("*")[0].removeAttribute("id");
+  } else {
+    document.getElementsByTagName("*")[0].id = "sh_theme";
+  }
 }
 
 function google_translation(){
@@ -234,13 +302,19 @@ function load_en_file() {
 				json_table[key].replace(/</g,'&lt;')+"</span>";
 				txt += "<textarea onblur='changed_input_text(this)'>";
 				txt += json_table[key].replace(/'/g,"&apos;")+"</textarea>";
+        // alert icon img for the text area
+        txt += "<img class='alert_icon'>";
 				//div for the google translated text
 				txt += "<div class='translate'>";
 				txt += json_table[key].replace(/</g,'&lt;')+"</div>";
 				txt+="</li>";
 			}
 			else{
-				txt += "<li><span class='collapse_button' onclick='collapse(this)'>"+key+"</span>";
+        // down icon img for the collapse button
+				txt += "<li><span class='collapse_button' onclick='collapse(this)'><img class='down_icon'><p>"+key+"</p></span>";
+
+        // alert icon img for the collapse button
+        txt += "<img class='alert_icon_collapse'>";
 				txt += populateHTML(json_table[key], current_key);
 				txt += "</li>";
 			}

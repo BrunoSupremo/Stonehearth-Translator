@@ -1,41 +1,48 @@
-<html>
+<html id="sh_theme">
+<!-- <html> -->
 <head>
 	<title>Stonehearth Translator Tool</title>
 	<meta charset="utf-8">
-	<link rel="stylesheet" type="text/css" href="css.css">
+	<link rel="stylesheet" type="text/css" href="themes/css.css">
+	<link rel="stylesheet" type="text/css" href="themes/sh.css">
 	<link rel="shortcut icon" type="image/png" href="favicon.png"/>
 </head>
 <body class="notranslate">
 	<header>
 		<div>
-			<label>
-				📂 Load first.json
+			<label class="open_folder">
+				<img class="open_folder" alt="open folder"><p>Load first.json</p>
 				<input type="file" accept=".json" id="en_fileinput_element" onchange="load_en_file()">
 			</label>
-			<label>
-				📂 Load second.json
+			<label class="open_folder">
+				<img class="open_folder" alt="open folder"><p>Load second.json</p>
 				<input type="file" accept=".json" id="your_fileinput_element" onchange="load_your_file()">
 			</label>
-			<label id="download" onclick="download()">
-				💾 Save translation.json
+			<label class="save_icon" id="download" onclick="download()">
+				<img class="save_icon" alt="save icon"><p>Save translation.json</p>
 				<a href="" id="actual_download" style="display: none;" download="your_translation.json"></a>
 			</label>
 		</div>
 		<div>
-			<label id="collapse_all_translated" onclick="collapse_all_translated()">
-				🔺 Collapse completed blocks
-			</label>
-			<label id="goto_next_unstranslated" onclick="goto_next_unstranslated()">
-				📑 Next untranslated
-			</label>
-		</div>
+      <label class="down_icon" id="collapse_all_translated" onclick="collapse_all_translated()">
+        <img class="down_icon" alt="down icon"><p>Collapse completed blocks</p>
+      </label>
+      <label class="edit_icon" id="goto_next_unstranslated" onclick="goto_next_unstranslated()">
+        <img class="edit_icon" alt="edit icon"><p>Next untranslated</p>
+      </label>
+      <label class="theme_icon" id="change_theme" onclick="change_theme()">
+        <img class="theme_icon" alt="theme icon"><p>Change theme</p>
+      </label>
+    </div>
 		<div>
-			<label id="google_translation" onclick="google_translation()">
-				🤖 Fill with Google
+			<label class="golem_icon" id="google_translation" onclick="google_translation()">
+				<img class="golem_icon" alt="golem icon"><p>Fill with Google</p>
 			</label>
 		</div>
 	</header>
+  <div class="body_header"></div>
 	<main></main>
+  <div class="body_footer"></div>
 	<footer>
 		<span id="status">Loaded: Nothing</span>
 		<span id="strings">Strings: 0</span>
