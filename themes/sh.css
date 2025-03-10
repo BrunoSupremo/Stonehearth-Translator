@@ -239,7 +239,7 @@
     background-image: url(../images/well.png);
     border-image: url(../images/well.png) 11 7 14 7 repeat;
     border-style: solid;
-    margin-right: -7px;
+    margin-right: -6.364px;
     padding-top: .5em;
   }
 
