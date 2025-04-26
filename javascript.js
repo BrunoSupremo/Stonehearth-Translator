@@ -66,16 +66,16 @@ function update_json_file(this_input){
 }
 
 var last_active_input = null;
-function changed_input_text(this_input){
-	last_active_input = this_input;
-	update_json_file(this_input);
+function changed_input_text(){
+	last_active_input = this;
+	update_json_file(this);
 
-	if ( this_input.value == this_input.previousSibling.textContent
-		&& this_input.value != "" && this_input.value != " " ){
-		if( !this_input.classList.contains("needs_translation") ){
+	if ( this.value == this.previousSibling.textContent
+		&& this.value != "" && this.value != " " ){
+		if( !this.classList.contains("needs_translation") ){
 			needs_translation++;
-			this_input.classList.add("needs_translation");
-			let ul_element= this_input.parentNode;
+			this.classList.add("needs_translation");
+			let ul_element= this.parentNode;
 			while (ul_element.tagName != "MAIN") {
 				if (ul_element.tagName == "UL"){
 					ul_element.classList.add("needs_translation");
@@ -84,10 +84,10 @@ function changed_input_text(this_input){
 			}
 		}
 	}else{
-		if( this_input.classList.contains("needs_translation") ){
+		if( this.classList.contains("needs_translation") ){
 			needs_translation--;
-			this_input.classList.remove("needs_translation");
-			let ul_element= this_input.parentNode;
+			this.classList.remove("needs_translation");
+			let ul_element= this.parentNode;
 			while (ul_element.tagName != "MAIN") {
 				if (ul_element.tagName == "UL"){
 					let child_needs_translation = false
@@ -141,9 +141,9 @@ function changed_all_input_text(){
 	}
 }
 
-function collapse(arrow){
-	arrow.nextSibling.classList.toggle("collapsed");
-	arrow.classList.toggle("change_arrow");
+function collapse(){
+	this.nextSibling.classList.toggle("collapsed");
+	this.classList.toggle("change_arrow");
 }
 
 function reset_input_file(input_file_element){
@@ -223,29 +223,47 @@ function load_en_file() {
 
 	string_counter = 0;
 	function populateHTML(json_table, json_key_in_input_id) {
-		var txt = "<ul>";
+		const ul = document.createElement("ul");
 		for (key in json_table) {
-			var current_key = json_key_in_input_id+"."+key;
+			let current_key = json_key_in_input_id+key;
 			if(typeof json_table[key] === 'string'){
 				string_counter++;
-				txt+="<li class='key_value'>";
-				txt += "<span class='key'>"+key+": </span>";
-				txt += "<span class='value' id='"+current_key.replace('.','')+"'>"+
-				json_table[key].replace(/</g,'&lt;')+"</span>";
-				txt += "<textarea onblur='changed_input_text(this)'>";
-				txt += json_table[key].replace(/'/g,"&apos;")+"</textarea>";
+				const li = document.createElement("li");
+				li.classList.add("key_value")
+				const span_key = document.createElement("span");
+				span_key.classList.add("key")
+				span_key.textContent = key
+				const span_value = document.createElement("span");
+				span_value.classList.add("value")
+				span_value.id = current_key
+				span_value.textContent = json_table[key]
+				const textarea = document.createElement("textarea");
+				textarea.onblur = changed_input_text
+				textarea.textContent = json_table[key]
 				//div for the google translated text
-				txt += "<div class='translate'>";
-				txt += json_table[key].replace(/</g,'&lt;')+"</div>";
-				txt+="</li>";
+				const div = document.createElement("div");
+				div.classList.add("translate")
+				div.textContent = json_table[key]
+
+				li.appendChild(span_key)
+				li.appendChild(span_value)
+				li.appendChild(textarea)
+				li.appendChild(div)
+				ul.appendChild(li)
 			}
 			else{
-				txt += "<li><span class='collapse_button' onclick='collapse(this)'>"+key+"</span>";
-				txt += populateHTML(json_table[key], current_key);
-				txt += "</li>";
+				const li = document.createElement("li");
+				const span = document.createElement("span");
+				span.classList.add("collapse_button");
+				span.onclick = collapse
+				span.textContent = key
+				const inner_ul = populateHTML(json_table[key], current_key + ".")
+				li.appendChild(span)
+				li.appendChild(inner_ul)
+				ul.appendChild(li)
 			}
 		}
-		return txt + "</ul>";
+		return ul;
 	}
 	function receivedText(e) {
 		let lines = e.target.result;
@@ -255,8 +273,7 @@ function load_en_file() {
 			alert("The json file contain an error. \n" + error );
 		}
 		saved_json = en_json;
-		let new_html = populateHTML(en_json, "");
-		document.getElementsByTagName("main")[0].innerHTML = new_html;
+		document.getElementsByTagName("main")[0].appendChild(populateHTML(en_json, ""));
 		changed_all_input_text();
 		update_footer();
 		reset_input_file(en_input);
@@ -281,13 +298,13 @@ function load_your_file() {
 
 	function populateHTML_inputs(json_table, json_key_in_input_id) {
 		for (key in json_table) {
-			var current_key = json_key_in_input_id+"."+key;
+			let current_key = json_key_in_input_id+key;
 			if(typeof json_table[key] === 'string'){
-				document.getElementById(current_key.replace('.',''))
+				document.getElementById(current_key)
 				.nextSibling.value = json_table[key];
 			}
 			else{
-				populateHTML_inputs(json_table[key], current_key);
+				populateHTML_inputs(json_table[key], current_key+".");
 			}
 		}
 	}
